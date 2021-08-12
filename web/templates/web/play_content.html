@@ -1,0 +1,73 @@
+{% load static %}
+{% load l10n %}
+
+{% if match_question.question.style == 'C' %}
+<h3>× Round {{ shift }} · Desafio ×</h3>
+{% else %}
+<h3>Round {{ shift }} · {{ match_question.team.name }}</h3>
+{% endif %}
+<h4 style="padding-top: 40px; padding-bottom: 40px">{{ match_question.question.title }}</h4>
+<div class="row">
+  <div class="col-lg-9" style="text-align: center">
+
+  {% if match_question.question.style == 'C' %}
+    <h5 style="margin: 0 auto">Quais grupos participar&atilde;o do desafio?</h5>
+    <div class="btn-group-justified" style="margin-bottom: 20px; margin-top: 20px" data-toggle="buttons">
+      {% for team in challenge.teams %}
+      <label style="padding-top: 10px; padding-bottom: 10px; padding-left: 20px; padding-right: 20px"
+        class="btn btn-primary
+        {% if team.status == 'W' %}
+         error
+        {% elif team.status == 'S' %}
+         highlighted
+        {% elif team.status == 'C' %}
+         active
+        {% endif %}">
+        <input type="checkbox"
+          {% if challenge.sorted %}
+           disabled
+          {% endif %}
+          value="{{team.id}}" autocomplete="off"> {{team.name}}</input>
+      </label>
+      {% endfor %}
+    </div>
+    {% if not challenge.sorted %}
+    <p><a id="sort" class="btn btn-primary btn-lg" href="javascript: challenge_sort({{ match_question.id }}, {{ shift }});" role="button">SORTEAR</a></p>
+    {% endif %}
+  {% endif %}
+
+  {% if answers %}
+    {% for answer in answers %}
+    <p style="text-align: justify"><a class="btn btn-success btn-lg" onclick="javascript: answer({{ answer.1.id }}, {{match_question.id}}, {{ match_question.team.id|default:0 }}, {{ shift }});" role="button">{{ answer.0 }}</a> {{ answer.1.content }}</p>
+    {% endfor %}
+  {% else %}
+    {% if match_question.question.style != 'C' or challenge.sorted %}
+    <h5 style="margin-bottom: 20px; margin-top: 20px">A resposta dada est&aacute;...</h5>
+    <p><a class="btn btn-primary btn-lg" href="javascript: answer(1, {{match_question.id}}, {{ match_question.team.id|default:0 }}, {{ shift }});" role="button">CERTA</a>
+    <a class="btn btn-primary btn-lg" href="javascript: answer(0, {{match_question.id}}, {{ match_question.team.id|default:0 }}, {{ shift }});" role="button">ERRADA</a></p>
+    {% endif %}
+  {% endif %}
+  </div>
+  <div class="col-lg-3" style="background: #089a7e">
+    <div style="padding: 10px;">
+      <h5>Pontua&ccedil;&atilde;o</h5>
+      {% for team in teams %}
+      <div class="row" style="padding-top: 5px; padding-bottom: 5px;{% if not forloop.last %} border-bottom: 2px solid #18bc9c{% endif %}">
+        <div class="col-1" style="text-align: left">
+          {{ forloop.counter }}º
+        </div>
+        <div class="col" style="text-align: left">
+          {{ team.name }}
+        </div>
+        <div class="col-4" style="text-align: right">
+          {{ team.points }}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{% block scripts %}
+
+{% endblock scripts %}

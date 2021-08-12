@@ -1,0 +1,41 @@
+{% load static %}
+{% load l10n %}
+
+<h3>Fim de jogo</h3>
+
+<h4 style="padding-top: 40px; padding-bottom: 40px">
+{% if no_winner %}
+Que pena! N&atilde;o tivemos ganhadores nesta partida.
+{% elif tie %}
+&Eacute; um empate! Parab&eacute;ns aos grupos vencedores.
+{% else %}
+Uau! Parab&eacute;ns, {{ winner }}, pela vit&oacute;ria!
+{% endif %}
+</h4>
+
+<div class="row">
+
+  <div class="col-lg-3" style="background: #089a7e; margin: 0 auto">
+    <div style="padding: 10px;">
+      <h5>Resultado</h5>
+      {% for team in teams %}
+      <div class="row" style="padding-top: 5px; padding-bottom: 5px;{% if not forloop.last %} border-bottom: 2px solid #18bc9c{% endif %}">
+        <div class="col-1" style="text-align: left">
+          {{ forloop.counter }}º
+        </div>
+        <div class="col" style="text-align: left">
+          {{ team.name }}
+        </div>
+        <div class="col-4" style="text-align: right">
+          {{ team.points }}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+</div>
+
+{% block scripts %}
+
+{% endblock scripts %}

@@ -1,0 +1,83 @@
+{% extends 'web/base.html' %}
+{% load static %}
+{% load l10n %}
+
+{% block header %}
+<header class="masthead">
+  <div class="container">
+    <h4 style="margin: 0 auto">Quantos grupos jogar&atilde;o esta partida?</h4>
+    <div class="btn-group" style="margin-bottom: 20px; margin-top: 20px" data-toggle="buttons">
+      <label style="padding-top: 10px; padding-bottom: 10px; padding-left: 20px; padding-right: 20px" class="btn btn-primary active">
+        <input type="radio" name="teams" id="option2" value="2" autocomplete="off" checked> 2</input>
+      </label>
+      <label style="padding-top: 10px; padding-bottom: 10px; padding-left: 20px; padding-right: 20px" class="btn btn-primary">
+        <input type="radio" name="teams" id="option3" value="3" autocomplete="off"> 3</input>
+      </label>
+      <label style="padding-top: 10px; padding-bottom: 10px; padding-left: 20px; padding-right: 20px" class="btn btn-primary">
+        <input type="radio" name="teams" id="option4" value="4" autocomplete="off"> 4</input>
+      </label>
+      <label style="padding-top: 10px; padding-bottom: 10px; padding-left: 20px; padding-right: 20px" class="btn btn-primary">
+        <input type="radio" name="teams" id="option5" value="5" autocomplete="off"> 5</input>
+      </label>
+    </div>
+    <form id="teamConfig" action="/game/setup" method="post">{% csrf_token %}
+      <input id="qtdTeams" name="teams" type="hidden" value="2">
+      <div class="form-group" id="team1" style="display: none">
+        <input type="text" style="margin: 0 auto;" class="form-control col-lg-4" name="team1" placeholder="Grupo 1">
+      </div>
+      <div class="form-group" id="team2" style="display: none">
+        <input type="text" style="margin: 0 auto;" class="form-control col-lg-4" name="team2" placeholder="Grupo 2">
+      </div>
+      <div class="form-group" id="team3" style="display: none">
+        <input type="text" style="margin: 0 auto;" class="form-control col-lg-4" name="team3" placeholder="Grupo 3">
+      </div>
+      <div class="form-group" id="team4" style="display: none">
+        <input type="text" style="margin: 0 auto;" class="form-control col-lg-4" name="team4" placeholder="Grupo 4">
+      </div>
+      <div class="form-group" id="team5" style="display: none">
+        <input type="text" style="margin: 0 auto;" class="form-control col-lg-4" name="team5" placeholder="Grupo 5">
+      </div>
+    </form>
+    <p><a class="btn btn-primary btn-lg" href="javascript: setup()" role="button">COME&Ccedil;AR</a></p>
+  </div>
+</header>
+{% endblock header %}
+
+{% block scripts %}
+<script>
+  function setup() {
+      $('#teamConfig').submit();
+  }
+
+  function showTeamsInput(qtd) {
+    teams = [$('#team1')[0],$('#team2')[0],$('#team3')[0],$('#team4')[0],$('#team5')[0]];
+    for (i = 0; i < 5; i++) {
+      if (i < qtd)
+        teams[i].style.display = 'block';
+      else
+        teams[i].style.display = 'none';
+    }
+    $('#qtdTeams')[0].value = qtd;
+  }
+
+  $('#option2').on('change', function () {
+      showTeamsInput(2);
+  });
+
+  $('#option3').on('change', function () {
+      showTeamsInput(3);
+  });
+
+  $('#option4').on('change', function () {
+      showTeamsInput(4);
+  });
+
+  $('#option5').on('change', function () {
+      showTeamsInput(5);
+  });
+
+  $(document).ready(function() {
+    showTeamsInput(2);
+  });
+</script>
+{% endblock scripts %}

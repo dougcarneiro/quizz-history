@@ -1,0 +1,128 @@
+{% extends 'web/base.html' %}
+{% load static %}
+{% load l10n %}
+
+{% block menu %}
+<div class="loading" id="load" style="display: none">Loading&#8230;</div>
+
+<button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+  Menu
+  <i class="fa fa-bars"></i>
+</button>
+<div class="collapse navbar-collapse" id="navbarResponsive">
+  <ul class="navbar-nav ml-auto">
+    <li class="nav-item">
+      <a class="nav-link js-scroll-trigger" href="/game/new">Nova partida</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link js-scroll-trigger" href="/game/stop">Encerrar</a>
+    </li>
+  </ul>
+</div>
+{% endblock menu %}
+
+{% block header %}
+<header class="masthead">
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" style="color: green" id="modalTitle"></h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body" style="color: #2C3E50" id="modalContent">
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal">Continuar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container" id="container">
+    {% if game_over %}
+      {% include 'web/game_over.html' %}
+    {% else %}
+      {% include 'web/play_content.html' %}
+    {% endif %}
+  </div>
+</header>
+{% endblock header %}
+
+{% block scripts %}
+<script>
+  function answer(alternative, match_question, team, shift) {
+    $('#load')[0].style.display = "block";
+
+    $.ajax({
+      url : "/game/answer",
+      type : "POST",
+      data : {csrfmiddlewaretoken: '{{ csrf_token }}',
+              alternative: alternative,
+              match_question: match_question,
+              team: team,
+              shift: shift},
+
+      success: function(response) {
+        $("#container").html(response.html);
+        $('#load')[0].style.display = "none";
+
+        data = JSON.parse(response.data);
+        if (data.show_dialog) {
+          if (data.right_answer) {
+            $("#modalTitle").html("Resposta certa :)");
+            $("#modalTitle")[0].style.color = "green";
+            $("#modalContent").html("Parab&eacute;ns, <b>"+data.team_name+"</b>! A resposta est&aacute; correta.");
+          } else {
+            $("#modalTitle").html("Resposta errada :(");
+              $("#modalTitle")[0].style.color = "red";
+            $("#modalContent").html("Que pena, <b>"+data.team_name+"</b>! A resposta est&aacute; incorreta.");
+          }
+
+          $('#myModal').modal();
+        }
+      },
+
+      error: function(json) {
+        $('#load')[0].style.display = "none";
+      }
+    });
+  }
+
+  function challenge_sort(match_question, shift) {
+    $('#load')[0].style.display = "block";
+
+    selected_teams = "";
+    teams_input = $(".btn-group-justified > label > input");
+
+    for (t = 0; t < teams_input.length; t++) {
+      if (teams_input[t].checked) {
+        selected_teams += teams_input[t].value + ",";
+      }
+    }
+
+    $.ajax({
+      url : "/game/challenge/sort",
+      type : "POST",
+      data : {csrfmiddlewaretoken: '{{ csrf_token }}',
+              match_question: match_question,
+              selected_teams: selected_teams,
+              shift: shift},
+
+      success: function(response) {
+        console.log(response);
+        $("#container").html(response.html);
+        $('#load')[0].style.display = "none";
+      },
+
+      error: function(json) {
+        console.log("error");
+        $('#load')[0].style.display = "none";
+      }
+    });
+  };
+</script>
+{% endblock scripts %}
